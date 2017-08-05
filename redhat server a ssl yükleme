@@ -1,0 +1,54 @@
+İlk önce  https://www.openssl.org/source/
+
+bu siteye girip en güncel ssl i seçiyoruz sonrasında şu komutla
+wget https://www.openssl.org/source/(indireceğiniz dosyanın adını yazıyoruz)
+
+
+indirdikten sonra
+tar -xzvf openssl-openssl-1.0.2l.tar.gz
+
+
+yazarak arşivi çıkartıyoruz.
+
+Daha sonra
+
+cd openssl-1.0.2l(bu indirdiğiniz dosyaya göre değişir) dosyanın içine girip 
+./config
+
+komutunu girerek biraz bekliyoruz.
+	
+make //daha sonra
+make install
+
+komutlarını girip işlemleri bitirmesini bekliyoruz.Bu işlemler biraz uzun sürecektir.
+
+sonrasında ssl sertifikası oluşturmak için pacahe dosyasımızın olduğu yere bir dosya oluşturuyoruz.
+
+	
+mkdir /etc/httpd/openssl
+
+şimdi sertifikamızı oluşturmaya geldi sıra.
+
+	
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/httpd/openssl/apache.key -out /etc/httpd/openssl/apache.crt
+
+-days dan sonra gelen sayı kaç gün geçerli olduğunu -keyout tan sonra gelen key lerin nerede depolanacağını out ta setifika için gerekli şeylerin nerede depolanacağını gösteriyor.Bu komuttan sonra size ait bazı bilgiler istiyor onları dolduruyoruz.
+
+Şimdi eski sertifika yerini değiştirmemiz gerekiyor artık ssl kullanıcaz çünkü.Onun için bir program yüklememiz gerekli mod_ssl onun için redhat için:
+yum install mod_ssl
+
+
+
+Şimdi ise https olması için iptables ayarlarından 443 portunu açmamız gerekiyor çünkü ssl 443 portunu dinleyerek çalışır. onun için:
+vim /etc/sysconfig/iptables
+
+	
+
+ben vim kullanıyorum siz başka şeyler kullanarakta dosyada değişiklik yapabilirsiniz.
+
+sonrasında şu satırı ekliyoruz:
+-A INPUT -p tcp -m  state --state NEW -m tcp --dport 443 -j ACCEPT
+
+
+Daha sonra iptables restart atıyoruz.Sonrasında artık ssl sertifikamız yükleniyor tarayıcınızdan girip bakabilirsiniz.
+
